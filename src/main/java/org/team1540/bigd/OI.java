@@ -42,8 +42,8 @@ public class OI {
     new SimpleButton(() -> getWristAxis() != 0).whileHeld(new JoystickArms());
 
     new JoystickButton(copilotJoystick, 2).whenPressed(new SimpleCommand("Toggle Grips", () -> {
-      Robot.grips.setLeftArmIn(Robot.grips.getLeftArmIn());
-      Robot.grips.setRightArmIn(Robot.grips.getRightArmIn());
+      Robot.grips.setLeftArmIn(!Robot.grips.getLeftArmIn());
+      Robot.grips.setRightArmIn(!Robot.grips.getRightArmIn());
     }));
     SimpleButton leftArmGrip =
         new SimpleButton(() -> copilotJoystick.getX(Hand.kLeft) < -0.5);
