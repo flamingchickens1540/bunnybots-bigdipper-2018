@@ -21,5 +21,13 @@ public class Grips extends Subsystem {
   public void setRightArmIn(boolean in) {
     rightActuator.set(in);
   }
+  
+  public boolean getLeftArmIn() {
+    return leftActuator.get();
+  }
+
+  public boolean getRightArmIn() {
+    return rightActuator.get();
+  }
 
 }

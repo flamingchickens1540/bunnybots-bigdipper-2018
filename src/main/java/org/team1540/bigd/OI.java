@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.team1540.bigd.commands.mechanism.Eject;
+import org.team1540.bigd.commands.mechanism.arms.JoystickArms;
 import org.team1540.bigd.commands.mechanism.arms.MoveArms;
 import org.team1540.bigd.commands.mechanism.Release;
 import org.team1540.bigd.commands.mechanism.RunIntake;
@@ -28,25 +29,37 @@ public class OI {
     new JoystickButton(driveJoystick, 6).whenPressed(new SimpleCommand("Set High Gear",
         () -> Robot.shifter.setHighGear(true), Robot.shifter));
 
+
     new JoystickButton(copilotJoystick, 5).whenPressed(new RunIntake());
     new JoystickButton(copilotJoystick, 7).whenPressed(new SimpleCommand("Stop Intake",
         () -> Robot.intake.set(0), Robot.intake));
+
     new JoystickButton(copilotJoystick, 8).whenPressed(new Release());
     new JoystickButton(copilotJoystick, 6).whenPressed(new Eject());
+
     new JoystickButton(copilotJoystick, 1).whenPressed(new MoveArms(ArmPosition.LO.getPosition()));
     new JoystickButton(copilotJoystick, 4).whenPressed(new MoveArms(ArmPosition.HI.getPosition()));
+    new SimpleButton(() -> getWristAxis() != 0).whileHeld(new JoystickArms());
+
+    new JoystickButton(copilotJoystick, 2).whenPressed(new SimpleCommand("Toggle Grips", () -> {
+      Robot.grips.setLeftArmIn(Robot.grips.getLeftArmIn());
+      Robot.grips.setRightArmIn(Robot.grips.getRightArmIn());
+    }));
     SimpleButton leftArmGrip =
         new SimpleButton(() -> copilotJoystick.getX(Hand.kLeft) < -0.5);
-    leftArmGrip.whenPressed(new SimpleCommand("Open Left", () -> Robot.grips.setLeftArmIn(false),
-        Robot.grips));
-    leftArmGrip.whenReleased(new SimpleCommand("Close Left", () -> Robot.grips.setLeftArmIn(true),
-        Robot.grips));
+    leftArmGrip.whenPressed(new SimpleCommand("Open Left Grip",
+        () -> Robot.grips.setLeftArmIn(false), Robot.grips));
+    leftArmGrip.whenReleased(new SimpleCommand("Close Left Grip",
+        () -> Robot.grips.setLeftArmIn(true), Robot.grips));
     SimpleButton rightArmGrip =
         new SimpleButton(() -> copilotJoystick.getX(Hand.kRight) > 0.5);
-    rightArmGrip.whenPressed(new SimpleCommand("Open Right",
+    rightArmGrip.whenPressed(new SimpleCommand("Open Right Grip",
         () -> Robot.grips.setRightArmIn(false)));
-    rightArmGrip.whenReleased(new SimpleCommand("Close Right",
+    rightArmGrip.whenReleased(new SimpleCommand("Close Right Grip",
         () -> Robot.grips.setRightArmIn(true)));
+
+    new JoystickButton(copilotJoystick, 3).whenPressed(new SimpleCommand("Eject Bunny",
+        () -> Robot.bunnyBoi.setBunnyActuator(true)));
   }
 
   public static double getThrottleInput() {
@@ -66,6 +79,10 @@ public class OI {
 
   public static double getEjectSpeed() {
     return Utilities.processDeadzone(copilotJoystick.getTriggerAxis(Hand.kLeft), defaultDeadzone);
+  }
+
+  public static double getWristAxis() {
+    return Utilities.processDeadzone(copilotJoystick.getY(Hand.kLeft), defaultDeadzone);
   }
 
 }

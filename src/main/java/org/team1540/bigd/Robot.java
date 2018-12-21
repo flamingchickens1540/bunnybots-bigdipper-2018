@@ -19,13 +19,14 @@ import org.team1540.bigd.subsystems.Intake;
 import org.team1540.bigd.subsystems.Shifter;
 import org.team1540.rooster.power.PowerManager;
 import org.team1540.rooster.testers.motor.SimpleControllersTester;
+import org.team1540.rooster.triggers.SimpleButton;
 import org.team1540.rooster.util.SimpleCommand;
 import org.team1540.rooster.wrappers.ChickenTalon;
 
 public class Robot extends IterativeRobot {
 
   public static final DriveTrain driveTrain = new DriveTrain();
-  public static Arms arms;
+  public static Arms arms = new Arms();
   public static final Shifter shifter = new Shifter();
   public static final Intake intake = new Intake();
   public static final Grips grips = new Grips();
@@ -85,8 +86,6 @@ public class Robot extends IterativeRobot {
 
   @Override
   public void robotInit() {
-    arms = new Arms();
-
     LiveWindow.disableAllTelemetry();
 
     PowerManager.getInstance().registerPowerManageable(driveTrain);
@@ -94,10 +93,15 @@ public class Robot extends IterativeRobot {
         .setGetTotalCurrent(PowerManager.getInstance().new GetPowerFromControllersDoubleSupplier());
     PowerManager.getInstance().setRunning(false);
 
-    Command zero = new SimpleCommand("Zero arms",
+    Command zeroHi = new SimpleCommand("Zero hi",
         () -> Robot.arms.setRealPosition(ArmPosition.HI.getPosition()));
-    zero.setRunWhenDisabled(true);
-    SmartDashboard.putData(zero);
+    zeroHi.setRunWhenDisabled(true);
+    SmartDashboard.putData(zeroHi);
+
+    Command zeroLo = new SimpleCommand("Zero lo",
+        () -> Robot.arms.setRealPosition(ArmPosition.LO.getPosition()));
+    zeroLo.setRunWhenDisabled(true);
+    SmartDashboard.putData(zeroLo);
   }
 
   @Override
@@ -107,8 +111,7 @@ public class Robot extends IterativeRobot {
 
   @Override
   public void autonomousInit() {
-    bunnyBoi.setBallActuator(true);
-    bunnyBoi.setBunnyActuator(true);
+    new SimpleCommand("Eject Ball", () -> bunnyBoi.setBallActuator(true)).start();
   }
 
   @Override
