@@ -17,4 +17,7 @@ public class RobotMap {
   public static final int rightArmSolenoid = 0;
   public static final int stopsSolenoid = 2;
   public static final int shiftingSolenoid = 3;
+
+  public static final int bunnySolenoid = 4;
+  public static final int ballSolenoid = 5;
 }

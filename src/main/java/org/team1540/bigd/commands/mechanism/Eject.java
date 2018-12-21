@@ -1,10 +1,9 @@
 package org.team1540.bigd.commands.mechanism;
 
 import edu.wpi.first.wpilibj.command.Command;
-import org.team1540.bigd.OI;
 import org.team1540.bigd.Robot;
-import org.team1540.bigd.Robot.MechanismState;
 import org.team1540.bigd.Tuning;
+import org.team1540.bigd.subsystems.Arms.ArmPosition;
 
 public class Eject extends Command {
 
@@ -18,8 +17,8 @@ public class Eject extends Command {
   protected void initialize() {
     setTimeout(Tuning.ejectTime);
     // Set it based on if the arms are up or down
-    Robot.intake.set(Robot.mechanismStateMachine.isInState(MechanismState.HAS_CUBE_LO) ?
-        1 : -1);
+    Robot.intake.set(Robot.arms.getPosition() > ArmPosition.FURTHEST_BACK.getPosition() ?
+        -1 : 1);
   }
 
   @Override

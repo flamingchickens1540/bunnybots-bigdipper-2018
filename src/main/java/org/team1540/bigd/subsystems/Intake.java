@@ -17,6 +17,8 @@ public class Intake extends ChickenSubsystem {
     left.setControlMode(ControlMode.PercentOutput);
     right.set(ControlMode.Follower, left.getDeviceID());
     right.setInverted(true);
+    left.setBrake(true);
+    right.setBrake(true);
   }
 
   @Override

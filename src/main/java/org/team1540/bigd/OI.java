@@ -1,14 +1,15 @@
 package org.team1540.bigd;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import org.team1540.bigd.Robot.MechanismState;
-import org.team1540.bigd.Robot.MechanismTransitions;
+import org.team1540.bigd.commands.mechanism.Eject;
+import org.team1540.bigd.commands.mechanism.arms.MoveArms;
+import org.team1540.bigd.commands.mechanism.Release;
+import org.team1540.bigd.commands.mechanism.RunIntake;
+import org.team1540.bigd.subsystems.Arms.ArmPosition;
 import org.team1540.rooster.Utilities;
 import org.team1540.rooster.preferencemanager.Preference;
-import org.team1540.rooster.triggers.AxisButton;
 import org.team1540.rooster.triggers.SimpleButton;
 import org.team1540.rooster.util.SimpleCommand;
 
@@ -27,53 +28,25 @@ public class OI {
     new JoystickButton(driveJoystick, 6).whenPressed(new SimpleCommand("Set High Gear",
         () -> Robot.shifter.setHighGear(true), Robot.shifter));
 
-    new JoystickButton(copilotJoystick, 5).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.START_INTAKE)));
-    new JoystickButton(copilotJoystick, 7).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.STOP_INTAKE)));
-    new JoystickButton(copilotJoystick, 8).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.RELEASE)));
-    new JoystickButton(copilotJoystick, 6).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.EJECT)));
-    new JoystickButton(copilotJoystick, 1).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.MOVE_LO)));
-    new JoystickButton(copilotJoystick, 4).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.MOVE_HI)));
-    new JoystickButton(copilotJoystick, 10).whenPressed(new SimpleCommand("Fire",
-        () -> Robot.mechanismStateMachine.fire(MechanismTransitions.CUBE_POSSESSION_OVERRIDE)));
+    new JoystickButton(copilotJoystick, 5).whenPressed(new RunIntake());
+    new JoystickButton(copilotJoystick, 7).whenPressed(new SimpleCommand("Stop Intake",
+        () -> Robot.intake.set(0), Robot.intake));
+    new JoystickButton(copilotJoystick, 8).whenPressed(new Release());
+    new JoystickButton(copilotJoystick, 6).whenPressed(new Eject());
+    new JoystickButton(copilotJoystick, 1).whenPressed(new MoveArms(ArmPosition.LO.getPosition()));
+    new JoystickButton(copilotJoystick, 4).whenPressed(new MoveArms(ArmPosition.HI.getPosition()));
     SimpleButton leftArmGrip =
-        new SimpleButton(() -> copilotJoystick.getX(Hand.kLeft) > 0.5);
-    leftArmGrip.whenPressed(new SimpleCommand("Close Left", () -> {
-      if (!Robot.hasCube()) {
-        Robot.grips.setLeftArmIn(true);
-      }
-    }, Robot.grips));
-    leftArmGrip.whenReleased(new SimpleCommand("Open Left", () -> {
-      if (!Robot.hasCube()) {
-        Robot.grips.setLeftArmIn(false);
-      }
-    }, Robot.grips));
+        new SimpleButton(() -> copilotJoystick.getX(Hand.kLeft) < -0.5);
+    leftArmGrip.whenPressed(new SimpleCommand("Open Left", () -> Robot.grips.setLeftArmIn(false),
+        Robot.grips));
+    leftArmGrip.whenReleased(new SimpleCommand("Close Left", () -> Robot.grips.setLeftArmIn(true),
+        Robot.grips));
     SimpleButton rightArmGrip =
-        new SimpleButton(() -> copilotJoystick.getX(Hand.kRight) < -0.5);
-    rightArmGrip.whenPressed(new SimpleCommand("Close Right", () -> {
-      if (!Robot.hasCube()) {
-        Robot.grips.setRightArmIn(true);
-      }
-    }, Robot.grips));
-    rightArmGrip.whenReleased(new SimpleCommand("Open Right", () -> {
-      if (!Robot.hasCube()) {
-        Robot.grips.setRightArmIn(false);
-      }
-    }, Robot.grips));
-//    new JoystickButton(copilotJoystick, 7).whenPressed(new SimpleCommand("Toggle Stops",
-//        () -> {
-//          boolean state = Robot.intake.getArmsIn();
-//          if (state) {
-//            Robot.mechanismStateMachine.fire(MechanismTransitions.RELEASE);
-//          }
-//          Robot.intake.setArmsIn(!state);
-//        }));
-
+        new SimpleButton(() -> copilotJoystick.getX(Hand.kRight) > 0.5);
+    rightArmGrip.whenPressed(new SimpleCommand("Open Right",
+        () -> Robot.grips.setRightArmIn(false)));
+    rightArmGrip.whenReleased(new SimpleCommand("Close Right",
+        () -> Robot.grips.setRightArmIn(true)));
   }
 
   public static double getThrottleInput() {
