@@ -1,1 +1,1 @@
-# bunnybots-bigdipper-2018
+# Code for 2018 Big Dipper bunnybot
