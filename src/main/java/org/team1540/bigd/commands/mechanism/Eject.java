@@ -9,16 +9,16 @@ public class Eject extends Command {
 
 
   public Eject() {
-    super(Tuning.ejectTime);
+    super(Tuning.intakeEjectTime);
     requires(Robot.intake);
   }
 
   @Override
   protected void initialize() {
-    setTimeout(Tuning.ejectTime);
+    setTimeout(Tuning.intakeEjectTime);
     // Set it based on if the arms are up or down
     Robot.intake.set(Robot.arms.getPosition() > ArmPosition.FURTHEST_BACK.getPosition() ?
-        -1 : 1);
+        -Tuning.intakeEjectSpeed : Tuning.intakeEjectSpeed);
   }
 
   @Override

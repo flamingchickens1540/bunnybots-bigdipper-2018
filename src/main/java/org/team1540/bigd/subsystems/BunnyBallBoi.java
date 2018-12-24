@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import org.team1540.bigd.RobotMap;
 
-public class BunnyBoi extends Subsystem {
+public class BunnyBallBoi extends Subsystem {
 
   private Solenoid bunnyActuator = new Solenoid(RobotMap.bunnySolenoid);
   private Solenoid ballActuator = new Solenoid(RobotMap.ballSolenoid);
@@ -18,7 +18,16 @@ public class BunnyBoi extends Subsystem {
     bunnyActuator.set(extended);
   }
 
+  public boolean getBunnyActuator() {
+    return bunnyActuator.get();
+  }
+
   public void setBallActuator(boolean extended) {
     ballActuator.set(extended);
   }
+
+  public boolean getBallActuator() {
+    return ballActuator.get();
+  }
+
 }

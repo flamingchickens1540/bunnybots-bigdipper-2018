@@ -38,6 +38,11 @@ public class MoveArms extends Command {
   }
 
   @Override
+  protected void end() {
+    Robot.arms.setPercentOutput(0);
+  }
+
+  @Override
   protected boolean isFinished() {
     return Robot.arms.getError() < Tuning.armsTolerance
         && Math.abs(Robot.arms.getTrajectoryPosition() - target) < Tuning.armsTolerance;

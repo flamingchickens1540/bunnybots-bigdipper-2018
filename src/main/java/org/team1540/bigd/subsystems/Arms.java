@@ -46,6 +46,11 @@ public class Arms extends ChickenSubsystem {
     // Button based position setting in OI
   }
 
+  public void setPercentOutput(double percentOutput) {
+    leftMotor.set(ControlMode.PercentOutput, percentOutput);
+    rightMotor.set(ControlMode.PercentOutput, percentOutput);
+  }
+
   public void setPosition(double position) {
     leftMotor.set(ControlMode.MotionMagic, position);
     rightMotor.set(ControlMode.MotionMagic, position);
@@ -99,5 +104,15 @@ public class Arms extends ChickenSubsystem {
     public int getPosition() {
       return position;
     }
+  }
+
+  // TODO temporary, delete me
+  public double getLeftCurrent() {
+    return leftMotor.getOutputCurrent();
+  }
+
+  // TODO temporary, delete me
+  public double getRightCurrent() {
+    return rightMotor.getOutputCurrent();
   }
 }

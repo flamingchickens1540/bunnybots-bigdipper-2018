@@ -43,14 +43,4 @@ public class Intake extends ChickenSubsystem {
     stops.set(out);
   }
 
-  // TODO temporary, delete me
-  public double getLeftCurrent() {
-    return left.getOutputCurrent();
-  }
-
-  // TODO temporary, delete me
-  public double getRightCurrent() {
-    return right.getOutputCurrent();
-  }
-
 }

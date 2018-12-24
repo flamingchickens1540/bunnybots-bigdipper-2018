@@ -1,13 +1,16 @@
 package org.team1540.bigd;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.team1540.bigd.commands.mechanism.Eject;
-import org.team1540.bigd.commands.mechanism.arms.JoystickArms;
-import org.team1540.bigd.commands.mechanism.arms.MoveArms;
+import org.team1540.bigd.commands.mechanism.IntakeFurther;
 import org.team1540.bigd.commands.mechanism.Release;
 import org.team1540.bigd.commands.mechanism.RunIntake;
+import org.team1540.bigd.commands.mechanism.Unstick;
+import org.team1540.bigd.commands.mechanism.arms.JoystickArms;
+import org.team1540.bigd.commands.mechanism.arms.MoveArms;
 import org.team1540.bigd.subsystems.Arms.ArmPosition;
 import org.team1540.rooster.Utilities;
 import org.team1540.rooster.preferencemanager.Preference;
@@ -29,10 +32,11 @@ public class OI {
     new JoystickButton(driveJoystick, 6).whenPressed(new SimpleCommand("Set High Gear",
         () -> Robot.shifter.setHighGear(true), Robot.shifter));
 
-
-    new JoystickButton(copilotJoystick, 5).whenPressed(new RunIntake());
+    new JoystickButton(copilotJoystick, 5).whileHeld(new RunIntake(false));
     new JoystickButton(copilotJoystick, 7).whenPressed(new SimpleCommand("Stop Intake",
         () -> Robot.intake.set(0), Robot.intake));
+    new SimpleButton(() -> copilotJoystick.getPOV() == 0).whenPressed(new Unstick());
+    new SimpleButton(() -> copilotJoystick.getPOV() == 180).whileHeld(new IntakeFurther());
 
     new JoystickButton(copilotJoystick, 8).whenPressed(new Release());
     new JoystickButton(copilotJoystick, 6).whenPressed(new Eject());
@@ -42,8 +46,13 @@ public class OI {
     new SimpleButton(() -> getWristAxis() != 0).whileHeld(new JoystickArms());
 
     new JoystickButton(copilotJoystick, 2).whenPressed(new SimpleCommand("Toggle Grips", () -> {
-      Robot.grips.setLeftArmIn(!Robot.grips.getLeftArmIn());
-      Robot.grips.setRightArmIn(!Robot.grips.getRightArmIn());
+      if (Robot.grips.getLeftArmIn() != Robot.grips.getRightArmIn()) {
+        Robot.grips.setLeftArmIn(false);
+        Robot.grips.setRightArmIn(false);
+      } else {
+        Robot.grips.setLeftArmIn(!Robot.grips.getLeftArmIn());
+        Robot.grips.setRightArmIn(!Robot.grips.getRightArmIn());
+      }
     }));
     SimpleButton leftArmGrip =
         new SimpleButton(() -> copilotJoystick.getX(Hand.kLeft) < -0.5);
@@ -58,8 +67,8 @@ public class OI {
     rightArmGrip.whenReleased(new SimpleCommand("Close Right Grip",
         () -> Robot.grips.setRightArmIn(true)));
 
-    new JoystickButton(copilotJoystick, 3).whenPressed(new SimpleCommand("Eject Bunny",
-        () -> Robot.bunnyBoi.setBunnyActuator(true)));
+    new JoystickButton(copilotJoystick, 8).whenPressed(new SimpleCommand(
+        "Toggle Bunny", () -> Robot.bunnyBoi.setBunnyActuator(!Robot.bunnyBoi.getBunnyActuator())));
   }
 
   public static double getThrottleInput() {
@@ -82,7 +91,15 @@ public class OI {
   }
 
   public static double getWristAxis() {
-    return Utilities.processDeadzone(copilotJoystick.getY(Hand.kLeft), defaultDeadzone);
+    return Tuning.armsJoystickScale * (
+        Utilities.processDeadzone(copilotJoystick.getTriggerAxis(Hand.kLeft),
+            0.5) - Utilities.processDeadzone(copilotJoystick.getTriggerAxis(Hand.kRight), 0.5));
+//    return Utilities.processDeadzone(copilotJoystick.getY(Hand.kLeft), 0.2);
+  }
+
+  public static void setCopilotJoystickRumble(double rumble) {
+    copilotJoystick.setRumble(RumbleType.kLeftRumble, rumble);
+    copilotJoystick.setRumble(RumbleType.kRightRumble, rumble);
   }
 
 }
